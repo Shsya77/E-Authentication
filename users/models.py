@@ -40,6 +40,7 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractUser):
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField('email address', unique=True)
+    phone = models.CharField(max_length=12, default=0000000000)
     is_verified = models.BooleanField(default=False)
     otp = models.CharField(max_length=6, default=000000)
 

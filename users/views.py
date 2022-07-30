@@ -2,14 +2,20 @@ from django.forms import PasswordInput
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib import messages
-from .forms import UserRegisterForm
-# Create your views here.
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from .models import CustomUser
 import random
+from twilio.rest import Client
+from django.core.mail import send_mail
 
+from .models import CustomUser
+from .forms import UserRegisterForm
+
+import environ
+# Initialise environment variables
+env = environ.Env()
+environ.Env.read_env()
 
 def home(request):
     return render(request, 'users/home.html')
@@ -26,10 +32,10 @@ def register(request):
                 request, f'Hi {username}, your account was created successfully!')
             user = authenticate(username=username,
                                 password=form.cleaned_data['password1'])
-            if not user:
+            if user:
                 if user.is_active:
                     auth_login(request, user)
-                return redirect('home')
+                    return redirect('/landingpage')
             else:
                 pass
     else:
@@ -48,10 +54,32 @@ def landingpage(request):
 
 def otp(request):
    if request.user:
-        user = CustomUser.objects.filter(username=request.user.username)
-        otp = random.randrange(100000, 999999)
-        user.otp = otp
-        return render(request, 'users/otp.html', {'otp':otp})
+        user = CustomUser.objects.filter(username=request.user.username).first()
+        otp_val = random.randrange(100000, 999999)
+        user.otp = otp_val
+        account_sid = env('TWILIO_ACCOUNT_SID')
+        auth_token = env('TWILIO_AUTH_TOKEN')
+        client = Client(account_sid, auth_token)
+
+        client.messages.create(to=[f"+91{str(user.phone)}"],
+                      from_ = "+18507879893",
+                      body="Dear Customer,\nYour OTP is \""+str(user.otp)+"\".\nUse this password to validate your login.")
+
+        return render(request, 'users/otp.html')
+
+def otp_handler(request):
+    if request.user:
+        user = CustomUser.objects.filter(username=request.user.username).first()
+        otp_value = request.POST['otp']
+        if user.otp == otp_value:
+            user.is_verfied = True
+            messages.success(request, "Account verified")
+            return redirect('/')
+        messages.error(request, "Otp is invalid")
 
 def qr_code(request):
-    return render(request,'users/qr_code.html')    
+     if request.user:
+        user = CustomUser.objects.filter(username=request.user.username)
+        otp_val = random.randrange(100000, 999999)
+        user.otp = otp_val
+        return render(request,'users/qr_code.html')    
