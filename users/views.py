@@ -23,3 +23,9 @@ def register(request):
 @login_required()
 def profile(request):
     return render(request,'users/profile.html')
+
+def landingpage(request):
+    return render(request,'users/landingpage.html')
+
+def otp(request):
+    return render(request,'users/otp.html')

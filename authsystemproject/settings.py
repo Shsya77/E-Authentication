@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import os
+
+from users.views import landingpage
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -40,7 +42,7 @@ INSTALLED_APPS = [
     #own
     'users.apps.UsersConfig',
     'crispy_forms',
-    'phone_field'
+    
 ]
 
 MIDDLEWARE = [
@@ -132,6 +134,11 @@ STATICFILES_DIRS = [
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'landingpage'
 
 LOGIN_URL ='login'
+
+OTP_URL ='otp'
+
+
+
