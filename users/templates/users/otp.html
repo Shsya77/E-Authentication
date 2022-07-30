@@ -11,6 +11,7 @@
                   <h7><b><p style="color:rgb(240, 240, 240)"> OTP has been sent </p></b></h7>
       
                   <form class="form-group" method="POST" action="{% url 'otp_handler' %}">
+                    {% csrf_token %}
                       <div class="input-group">
                         <input
                           required
@@ -22,9 +23,9 @@
                       </div>
                     </div>
       
-                  <form>
+                    <button  class="btn" style="color: white; background-color: #fd5e14;" type="submit" id="header-links">VERIFY</button>
+                  <f/orm>
                      
-                        <a href="/profile/" class="btn" style="color: white; background-color: #fd5e14;" type="submit" id="header-links">VERIFY</a>
                       <h3 id="demo"></h3>
                     </div>
                     

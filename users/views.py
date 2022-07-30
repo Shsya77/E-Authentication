@@ -56,13 +56,8 @@ def otp(request):
         user = CustomUser.objects.filter(username=request.user.username).first()
         otp_val = random.randrange(100000, 999999)
         user.otp = otp_val
-        # account_sid = env('TWILIO_ACCOUNT_SID')
-        # auth_token = env('TWILIO_AUTH_TOKEN')
-        # client = Client(account_sid, auth_token)
+        user.save()
 
-        # client.messages.create(to=[f"+91{str(user.phone)}"],
-        #               from_ = "+18507879893",
-        #               body="Dear Customer,\nYour OTP is \""+str(user.otp)+"\".\nUse this password to validate your login.")
         send_otp(user.otp, user.phone)
         return render(request, 'users/otp.html')
 
@@ -71,10 +66,12 @@ def otp_handler(request):
         user = CustomUser.objects.filter(username=request.user.username).first()
         otp_value = request.POST['otp']
         if user.otp == otp_value:
-            user.is_verfied = True
+            user.is_verified = True
+            user.save()
             messages.success(request, "Account verified")
-            return redirect('/')
+            return redirect('/profile')
         messages.error(request, "Otp is invalid")
+        return redirect('/')
 
 
 
