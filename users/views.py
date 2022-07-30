@@ -29,3 +29,6 @@ def landingpage(request):
 
 def otp(request):
     return render(request,'users/otp.html')
+
+def qr_code(request):
+    return render(request,'users/qr_code.html')    

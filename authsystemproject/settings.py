@@ -138,3 +138,5 @@ LOGIN_URL ='login'
 
 OTP_URL = 'otp'
 
+QR_CODE_URL = 'qr_code'
+
