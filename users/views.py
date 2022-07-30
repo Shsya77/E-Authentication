@@ -6,13 +6,12 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 import random
-from twilio.rest import Client
 from django.core.mail import send_mail
+import environ
 
 from .models import CustomUser
 from .forms import UserRegisterForm
-
-import environ
+from .utils import send_otp
 # Initialise environment variables
 env = environ.Env()
 environ.Env.read_env()
@@ -57,18 +56,18 @@ def otp(request):
         user = CustomUser.objects.filter(username=request.user.username).first()
         otp_val = random.randrange(100000, 999999)
         user.otp = otp_val
-        account_sid = env('TWILIO_ACCOUNT_SID')
-        auth_token = env('TWILIO_AUTH_TOKEN')
-        client = Client(account_sid, auth_token)
+        # account_sid = env('TWILIO_ACCOUNT_SID')
+        # auth_token = env('TWILIO_AUTH_TOKEN')
+        # client = Client(account_sid, auth_token)
 
-        client.messages.create(to=[f"+91{str(user.phone)}"],
-                      from_ = "+18507879893",
-                      body="Dear Customer,\nYour OTP is \""+str(user.otp)+"\".\nUse this password to validate your login.")
-
+        # client.messages.create(to=[f"+91{str(user.phone)}"],
+        #               from_ = "+18507879893",
+        #               body="Dear Customer,\nYour OTP is \""+str(user.otp)+"\".\nUse this password to validate your login.")
+        send_otp(user.otp, user.phone)
         return render(request, 'users/otp.html')
 
 def otp_handler(request):
-    if request.user:
+    if request.user and request.method=='POST':
         user = CustomUser.objects.filter(username=request.user.username).first()
         otp_value = request.POST['otp']
         if user.otp == otp_value:
@@ -76,6 +75,8 @@ def otp_handler(request):
             messages.success(request, "Account verified")
             return redirect('/')
         messages.error(request, "Otp is invalid")
+
+
 
 def qr_code(request):
      if request.user:
