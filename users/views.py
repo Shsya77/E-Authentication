@@ -71,7 +71,7 @@ def otp_handler(request):
             messages.success(request, "Account verified")
             return redirect('/profile')
         messages.error(request, "Otp is invalid")
-        return redirect('/')
+        return redirect('/login')
 
 
 
